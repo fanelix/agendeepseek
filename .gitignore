@@ -1,0 +1,13 @@
+# Secrets. The DeepSeek API key lives here.
+.env
+.env.*
+!.env.example
+
+# The mounted project directory: yours, not this repository's.
+/workspace/*
+!/workspace/.gitkeep
+
+# opencode local state, if you ever run it outside the container.
+.opencode/
+
+.DS_Store

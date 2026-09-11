@@ -1,0 +1,3 @@
+# The image installs opencode from npm and copies nothing out of the
+# repository, so the build context stays empty on purpose.
+*

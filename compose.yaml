@@ -1,0 +1,37 @@
+name: agendeepseek
+
+services:
+  opencode:
+    build:
+      context: .
+      args:
+        OPENCODE_VERSION: ${OPENCODE_VERSION:-1.18.30}
+    image: agendeepseek:${OPENCODE_VERSION:-1.18.30}
+
+    # Published on loopback only, on purpose. The server has no password and
+    # can run shell commands inside the mounted workspace, so it must not be
+    # reachable from the network. Read "Security" in README.md before widening
+    # this to 0.0.0.0.
+    ports:
+      - "127.0.0.1:${PORT:-4096}:4096"
+
+    environment:
+      # Read by opencode.json through its {env:...} substitution. The ":?" makes
+      # compose refuse to start with a clear message when the key is missing,
+      # instead of booting a server that fails on the first prompt.
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:?set DEEPSEEK_API_KEY in .env (copy .env.example)}
+
+    volumes:
+      # The project opencode reads and edits. Point this at your own code when
+      # you want to work on something outside this repository.
+      - ./workspace:/workspace
+      # Model and provider settings. The image points OPENCODE_CONFIG at this
+      # path. Read-only: the container never needs to write it.
+      - ./opencode.json:/etc/opencode/opencode.json:ro
+      # Sessions and message history.
+      - opencode-data:/home/node/.local/share/opencode
+
+    restart: unless-stopped
+
+volumes:
+  opencode-data:

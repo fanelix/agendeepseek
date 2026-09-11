@@ -6,6 +6,10 @@ services:
       context: .
       args:
         OPENCODE_VERSION: ${OPENCODE_VERSION:-1.18.30}
+        # Must match the owner of the workspace you mount below, or the agent
+        # cannot write to it. See "Workspace permissions" in README.md.
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     image: agendeepseek:${OPENCODE_VERSION:-1.18.30}
 
     # Published on loopback only, on purpose. The server has no password and

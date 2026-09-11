@@ -125,6 +125,37 @@ WORKSPACE=/path/to/your/project ./run-local.sh
 
 The agent can edit anything under that path, so mount the project you mean.
 
+## Workspace permissions
+
+The agent runs as an unprivileged user inside the container, uid 1000 by
+default. A bind-mounted directory keeps the ownership it has on the host, so if
+that uid cannot write to the directory you mounted, the agent can read your
+project but every edit fails.
+
+On macOS, Docker Desktop maps ownership for you and this never comes up. On
+Linux it matters when your account is not uid 1000, or when the directory is
+owned by root. Check with `id -u`, and if it is not 1000, set both in `.env`
+and rebuild:
+
+```bash
+UID=1002
+GID=1002
+```
+
+```bash
+docker compose up -d --build
+```
+
+The build renumbers the container user to match, which covers the workspace and
+the session store together. A quick way to confirm it worked:
+
+```bash
+docker compose exec opencode touch /workspace/.probe && echo writable
+```
+
+Do not set `UID=0`. It would run the agent as root, and the rename step fails
+against the existing root account anyway.
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -132,6 +163,7 @@ The agent can edit anything under that path, so mount the project you mean.
 | `DEEPSEEK_API_KEY` | — | Required. Compose refuses to start without it. |
 | `PORT` | `4096` | Host port for the web UI. |
 | `OPENCODE_VERSION` | `1.18.30` | opencode release built into the image. |
+| `UID` / `GID` | `1000` | The uid/gid the agent runs as. Must own the workspace; see above. |
 | `WORKSPACE` | `./workspace` | `run-local.sh` only: the directory to open. |
 | `BIND` | `127.0.0.1` | `run-local.sh` only: the interface to listen on. |
 
@@ -172,6 +204,10 @@ docker compose logs opencode
 ```
 
 A model identifier that is not in that list is the usual cause.
+
+**The agent reads files but every edit fails.** A permission denied on write is
+the uid mismatch described in [Workspace
+permissions](#workspace-permissions), not an opencode problem.
 
 **`Provider not found: deepseek`.** opencode resolves provider metadata from
 `models.opencode.ai`. If the container cannot reach it, the provider list falls

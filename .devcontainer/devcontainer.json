@@ -1,0 +1,33 @@
+{
+  "name": "agendeepseek",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+
+  // Installs the opencode release pinned in .env.example, so the Codespace and
+  // the Docker image stay on the same version.
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  // Runs on every start, not just the first, so a resumed Codespace comes back
+  // with the server already listening.
+  "postStartCommand": "bash .devcontainer/start-opencode.sh",
+
+  "forwardPorts": [4096],
+  "portsAttributes": {
+    "4096": {
+      "label": "OpenCode Web",
+      "protocol": "http",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // Codespaces prompts for this if it is not already set as a secret. It can
+  // also be added under Settings > Codespaces > Secrets for reuse.
+  "secrets": {
+    "DEEPSEEK_API_KEY": {
+      "description": "DeepSeek API key. Create one at https://platform.deepseek.com/api_keys"
+    }
+  },
+
+  // opencode runs shell commands on behalf of the model, so it should not be
+  // root here either.
+  "remoteUser": "node"
+}

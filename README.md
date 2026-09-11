@@ -9,8 +9,10 @@ The server is started with `opencode serve`, which embeds the same web UI that
 
 ## Requirements
 
-- Docker with the Compose plugin, **or** Node.js 22+ for the local path below.
 - A DeepSeek API key from <https://platform.deepseek.com/api_keys>.
+- Docker with the Compose plugin, **or** Node.js 22+ for the local path below.
+  A [Codespace](#running-it-in-a-codespace) needs neither and runs in the
+  browser.
 
 ## Quick start
 
@@ -47,6 +49,35 @@ cp .env.example .env        # then put your real key in .env
 It reads `.env`, but a variable already set in your shell wins, so
 `PORT=4200 ./run-local.sh` works for a one-off. It refuses to start when
 `DEEPSEEK_API_KEY` is missing rather than failing later on the first prompt.
+
+## Running it in a Codespace
+
+Needs no Docker and no local install. Everything runs in the browser.
+
+1. Add a Codespaces secret named `DEEPSEEK_API_KEY` under **Settings >
+   Codespaces > Secrets**, and grant it access to this repository. Codespaces
+   also offers to prompt for it when you create the Codespace.
+2. **Code > Codespaces > Create codespace.**
+3. Wait for the build. The port opens in a browser tab once the server answers;
+   it is also in the **Ports** panel, labelled **OpenCode Web**.
+
+In a Codespace the agent works on the repository checked out there, not on
+`workspace/`, so copying `.devcontainer/` into another repository gives you an
+agent for that project.
+
+Two things about the forwarded URL catch people out. It exists only while the
+Codespace is running, and Codespaces stop after about 30 minutes idle, so a
+saved link returns `404` until you start the Codespace again. The hostname also
+changes with every new Codespace, so there is nothing stable to bookmark.
+
+**Keep the port Private.** Private is the default, and a private port still
+opens normally in a browser signed in to GitHub. Making it Public hands anyone
+with the URL an agent that runs commands in your repository, with no password in
+the way. The rest of [Security](#security) applies here too.
+
+`devcontainer.json` is read when the container is **built**, so after changing
+it run **Codespaces: Rebuild Container**. Editing it in git does not change a
+Codespace that already exists.
 
 ## Security
 
@@ -216,6 +247,7 @@ back to a bundled subset. Confirm outbound HTTPS works from the container.
 ## Layout
 
 ```
+.devcontainer/   Codespaces: installs the pinned opencode and starts it
 compose.yaml     service, port publishing, volumes
 Dockerfile       pinned opencode on node:22-bookworm-slim, non-root, healthcheck
 opencode.json    provider and model selection

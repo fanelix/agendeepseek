@@ -17,9 +17,9 @@ jobs:
   analisis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -38,7 +38,7 @@ jobs:
             --keluar hasil/
 
       - name: Unggah artifact (retensi terpisah dari repo)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hasil-analisis
           path: hasil/

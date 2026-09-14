@@ -15,10 +15,14 @@ Diuji terhadap QGIS 3.x dan pyogrio/GDAL.
 
 from __future__ import annotations
 
-import sqlite3
 import struct
 from pathlib import Path
 from typing import Any, Iterable, Literal, Sequence
+
+# Catatan: `sqlite3` sengaja TIDAK diimpor di tingkat modul. Di Pyodide/stlite
+# modul ini adalah paket terpisah yang harus dimuat eksplisit (lihat
+# `requirements` di app/index.html); impor lazy membuat aplikasi tetap bisa
+# membaca CSV walau paket sqlite3 belum tersedia.
 
 GeomType = Literal["POINT", "LINESTRING", "POLYGON"]
 
@@ -143,6 +147,8 @@ class GpkgWriter:
 
     def __init__(self, path: str | Path, srs_id: int = -1,
                  srs_wkt: str | None = None, srs_name: str = "Grid tambang lokal"):
+        import sqlite3
+        self._sqlite3 = sqlite3
         self.path = Path(path)
         self.srs_id = srs_id
         self.srs_wkt = srs_wkt

@@ -33,7 +33,7 @@
     import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js";
 
     mount({
-      requirements: ["pandas", "numpy"],   // streamlit sudah menjadi runtime stlite
+      requirements: ["pandas", "numpy", "sqlite3"],  // streamlit sudah menjadi runtime stlite
       entrypoint: "app.py",
       files: {
         "app.py":                             { url: "./app.py" },
